@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title>Gestion des Produits</title>
+    <style>
+        /* Conservez les mêmes styles que categories.html ou adaptez-les */
+        :root {
+            --primary-blue: #2c3e50;
+            --secondary-blue: #3498db;
+            --light-blue: #ecf0f1;
+            --accent-blue: #2980b9;
+            --primary-green: #27ae60;
+            --accent-green: #2ecc71;
+        }
+
+        /* ... (Reprenez tous les styles CSS de categories.html) ... */
+
+        .badge-product {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--primary-green);
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container py-4">
+        <!-- Carte de formulaire -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas" th:classappend="${product.idProduct == null} ? 'fa-plus-circle' : 'fa-edit'"></i>
+                    <span th:text="${product.idProduct == null} ? 'Nouveau Produit' : 'Modifier Produit'"></span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <form th:action="${product.idProduct == null} ? @{/products} : @{'/products/' + ${product.idProduct}}"
+                      method="post">
+                    <input type="hidden" name="_method" th:if="${product.idProduct != null}" value="put">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="idProduct"
+                                       th:value="${product.idProduct}"
+                                       th:readonly="${product.idProduct != null}"
+                                       name="idProduct" required>
+                                <label for="idProduct">ID Produit</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="nomProduct"
+                                       th:value="${product.nomProduct}"
+                                       name="nomProduct" required>
+                                <label for="nomProduct">Nom Produit</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="prix"
+                                       th:value="${product.prix}"
+                                       name="prix" step="0.01" required>
+                                <label for="prix">Prix (€)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-control" id="category" name="category.idCategory" required>
+                                    <option th:each="cat : ${categories}"
+                                            th:value="${cat.idCategory}"
+                                            th:text="${cat.nomCategory}"
+                                            th:selected="${product.category != null && product.category.idCategory == cat.idCategory}">
+                                    </option>
+                                </select>
+                                <label for="category">Catégorie</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-save me-2"></i>
+                            <span th:text="${product.idProduct == null} ? 'Créer' : 'Mettre à jour'"></span>
+                        </button>
+                        <a th:href="@{/products}" th:if="${product.idProduct != null}"
+                           class="btn btn-outline-secondary ms-2 px-4">
+                            <i class="fas fa-times me-2"></i> Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Liste des produits -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i> Liste des Produits
+                    <span class="badge bg-white text-primary ms-2" th:text="${products.size()}"></span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th class="ps-4">ID</th>
+                            <th>Nom</th>
+                            <th>Prix</th>
+                            <th>Catégorie</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="prod : ${products}">
+                            <td class="ps-4 fw-bold" th:text="${prod.idProduct}"></td>
+                            <td>
+                                <span class="badge-product" th:text="${prod.nomProduct}"></span>
+                            </td>
+                            <td th:text="${#numbers.formatDecimal(prod.prix, 1, 2)} + ' €'"></td>
+                            <td>
+                                <span class="badge-category" th:text="${prod.category.nomCategory}"></span>
+                            </td>
+                            <td class="text-end pe-4 action-buttons">
+                                <a th:href="@{'/products/' + ${prod.idProduct}}"
+                                   class="btn btn-edit"
+                                   title="Modifier">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </a>
+                                <form th:action="@{'/products/' + ${prod.idProduct}}" method="post" class="d-inline">
+                                    <input type="hidden" name="_method" value="delete">
+                                    <button type="submit" class="btn btn-delete"
+                                            title="Supprimer"
+                                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce produit ?');">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${products.empty}">
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <i class="fas fa-inbox"></i>
+                                    <h5>Aucun produit trouvé</h5>
+                                    <p>Commencez par ajouter un nouveau produit</p>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

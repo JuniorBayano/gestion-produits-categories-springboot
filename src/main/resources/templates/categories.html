@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{base}">
+<head>
+    <title>Gestion des Catégories</title>
+    <style>
+        :root {
+            --primary-blue: #2c3e50;
+            --secondary-blue: #3498db;
+            --light-blue: #ecf0f1;
+            --accent-blue: #2980b9;
+        }
+
+        body {
+            background-color: #f8fafc;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            padding: 1.25rem 1.5rem;
+            border-bottom: none;
+        }
+
+        .card-header h5 {
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-header i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        .form-floating label {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .form-control {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 15px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-blue);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-secondary {
+            border-color: #e2e8f0;
+            color: #64748b;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .table tbody tr {
+            transition: all 0.2s;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(236, 240, 241, 0.5);
+        }
+
+        .badge-category {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: var(--secondary-blue);
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .action-buttons .btn {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin: 0 3px;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background-color: rgba(241, 196, 15, 0.1);
+            color: #f1c40f;
+            border: 1px solid rgba(241, 196, 15, 0.3);
+        }
+
+        .btn-edit:hover {
+            background-color: rgba(241, 196, 15, 0.2);
+            color: #f1c40f;
+        }
+
+        .btn-delete {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-delete:hover {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .empty-state {
+            padding: 2rem;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                border-radius: 0;
+            }
+
+            .action-buttons {
+                display: flex;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container py-4">
+        <!-- Carte de formulaire -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas" th:classappend="${category.idCategory == null} ? 'fa-plus-circle' : 'fa-edit'"></i>
+                    <span th:text="${category.idCategory == null} ? 'Nouvelle Catégorie' : 'Modifier Catégorie'"></span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <form th:action="${category.idCategory == null} ? @{/categories} : @{'/categories/' + ${category.idCategory}}"
+                      method="post">
+                    <input type="hidden" name="_method" th:if="${category.idCategory != null}" value="put">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="idCategory"
+                                       th:value="${category.idCategory}"
+                                       th:readonly="${category.idCategory != null}"
+                                       name="idCategory" required>
+                                <label for="idCategory">ID Catégorie</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="nomCategory"
+                                       th:value="${category.nomCategory}"
+                                       name="nomCategory" required>
+                                <label for="nomCategory">Nom Catégorie</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-save me-2"></i>
+                            <span th:text="${category.idCategory == null} ? 'Créer' : 'Mettre à jour'"></span>
+                        </button>
+                        <a th:href="@{/categories}" th:if="${category.idCategory != null}"
+                           class="btn btn-outline-secondary ms-2 px-4">
+                            <i class="fas fa-times me-2"></i> Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Liste des catégories -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i> Liste des Catégories
+                    <span class="badge bg-white text-primary ms-2" th:text="${categories.size()}"></span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th class="ps-4">ID</th>
+                            <th>Nom</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="cat : ${categories}">
+                            <td class="ps-4 fw-bold" th:text="${cat.idCategory}"></td>
+                            <td>
+                                <span class="badge-category" th:text="${cat.nomCategory}"></span>
+                            </td>
+                            <td class="text-end pe-4 action-buttons">
+                                <a th:href="@{'/categories/' + ${cat.idCategory}}"
+                                   class="btn btn-edit"
+                                   title="Modifier">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </a>
+                                <form th:action="@{'/categories/' + ${cat.idCategory}}" method="post" class="d-inline">
+                                    <input type="hidden" name="_method" value="delete">
+                                    <button type="submit" class="btn btn-delete"
+                                            title="Supprimer"
+                                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?');">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr th:if="${categories.empty}">
+                            <td colspan="3">
+                                <div class="empty-state">
+                                    <i class="fas fa-inbox"></i>
+                                    <h5>Aucune catégorie trouvée</h5>
+                                    <p>Commencez par ajouter une nouvelle catégorie</p>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

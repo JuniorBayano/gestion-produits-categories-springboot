@@ -1,0 +1,28 @@
+/* Ajoutez des styles supplémentaires si nécessaire */
+body {
+    padding-top: 20px;
+    background-color: #f8f9fa;
+}
+
+.card {
+    margin-bottom: 20px;
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-header {
+    font-weight: 500;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.btn-action {
+    width: 35px;
+    height: 35px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
